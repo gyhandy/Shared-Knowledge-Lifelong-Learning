@@ -51,37 +51,36 @@ imagnet_train_datasets, _, imagnet_train_loader, _ = load_dataloader(0, 32, shuf
 total_classes = [train_dataset.num_classes for train_dataset in origin_train_datasets]
 class_list = [train_dataset.dataset_name for train_dataset in origin_train_datasets]
 
-# # generate Xcepton results, only need once
-# for i in range(len(class_list)):
-#     print("doint i")
-#     fc = torch.nn.Linear(in_features=2048, out_features=total_classes[i], bias=True)
-#     state_dict = torch.load(f"/lab/harry/WorkSpace/yuecheng_code/weight_combining/result/weight/{dataset_name}/normal_norm_weight/{i}_{class_list[i]}.pth", map_location=device)
-#     with torch.no_grad():
-#         fc.weight.copy_(state_dict['weight'])
-#         fc.bias.copy_(state_dict["bias"])
-#     fc.to(device)
-#     fc.eval()
+# generate Xcepton results, only need once
+for i in range(len(class_list)):
+    fc = torch.nn.Linear(in_features=2048, out_features=total_classes[i], bias=True)
+    state_dict = torch.load(f"/lab/harry/WorkSpace/yuecheng_code/weight_combining/result/weight/{dataset_name}/normal_norm_weight/{i}_{class_list[i]}.pth", map_location=device)
+    with torch.no_grad():
+        fc.weight.copy_(state_dict['weight'])
+        fc.bias.copy_(state_dict["bias"])
+    fc.to(device)
+    fc.eval()
 
-#     xception_result = inference(fc, feature_val_loaders[i])
-#     check_path(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/")
-#     torch.save(xception_result, f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/Linear_{class_list[i]}_result.pth")
+    xception_result = inference(fc, feature_val_loaders[i])
+    check_path(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/")
+    torch.save(xception_result, f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/Linear_{class_list[i]}_result.pth")
 
-#     model = Xception_TB(total_classes[i])
-#     original_state_dict = model.state_dict()
-#     # st = torch.load(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_final/{model_type}_{task_name}.pth")
-#     # model.load_state_dict(st)
-#     state_dict = torch.load(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SHELL_{dataset_name}/BPN_{class_list[i]}.pth", map_location=device)
-#     for param in original_state_dict:
-#         if param[-6:] == "1.bias" or param == "fc.weight" or param == "fc.bias":
-#             original_state_dict[param] = state_dict[param]
-#     model.load_state_dict(state_dict)
-#     model.to(device)
-#     model.eval()
+    model = Xception_TB(total_classes[i])
+    original_state_dict = model.state_dict()
+    # st = torch.load(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_final/{model_type}_{task_name}.pth")
+    # model.load_state_dict(st)
+    state_dict = torch.load(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SHELL_{dataset_name}/BPN_{class_list[i]}.pth", map_location=device)
+    for param in original_state_dict:
+        if param[-6:] == "1.bias" or param == "fc.weight" or param == "fc.bias":
+            original_state_dict[param] = state_dict[param]
+    model.load_state_dict(state_dict)
+    model.to(device)
+    model.eval()
 
-#     BPN_result = inference(model, origin_agents_val_loaders[i])
-#     log(file_name, f"BPN model accuracy for task: {class_list[i]} is {sum(BPN_result)}")
-#     check_path(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/")
-#     torch.save(BPN_result, f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/BPN_{class_list[i]}_result.pth")
+    BPN_result = inference(model, origin_agents_val_loaders[i])
+    log(file_name, f"BPN model accuracy for task: {class_list[i]} is {sum(BPN_result)}")
+    check_path(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/")
+    torch.save(BPN_result, f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SKILL_gmmc/{dataset_name}/BPN_{class_list[i]}_result.pth")
 
 # load result of Xception and Xception BPN
 xception_results =[]

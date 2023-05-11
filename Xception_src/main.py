@@ -11,10 +11,12 @@ from datetime import datetime
 import time
 import sys
 
-sys.path.append("/lab/tmpig8d/u/yuecheng/yuecheng_code/")
-# sys.path.append("../..")
+# sys.path.append("/lab/tmpig8d/u/yuecheng/yuecheng_code/")
+sys.path.append("../")
 from dataset.dataloader_reader import load_dataloader
 from dataset.loader import resnet50_tf_pipeline, xception_tf_pipeline
+
+
 
 
 args = sys.argv[1].split(":")
@@ -25,10 +27,13 @@ model_type = args[2]
 batch_size = int(args[3])
 dataset = "decathlon"
 
+log_path = f"/lab/tmpig8d/u/yuecheng/yuecheng_log/SHELL_{dataset}/"
+weight_path = f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SHELL_{dataset}"
+
 def log(filename, message, model_type, write_time=False):
     import os
-    os.makedirs(f"/lab/tmpig8d/u/yuecheng/yuecheng_log/SHELL_{dataset}/", exist_ok=True)
-    with open(f"/lab/tmpig8d/u/yuecheng/yuecheng_log/SHELL_{dataset}/"+filename+f"_{model_type}_{batch_size}.txt", "a") as f:
+    os.makedirs(log_path, exist_ok=True)
+    with open(log_path+filename+f"_{model_type}_{batch_size}.txt", "a") as f:
         if write_time:
             f.write(str(datetime.datetime.now()))
             f.write("\n")
@@ -171,12 +176,12 @@ if __name__ == "__main__":
     log(str(arg_index),f"final evaluation accuracy is {best_eval}, current acc is {acc}", model_type)
 
 
-    with open(f"/lab/tmpig8d/u/yuecheng/yuecheng_log/SHELL_{dataset}/{model_type}_total.txt", "a") as f:
+    with open(f"{log_path}/{model_type}_total.txt", "a") as f:
         f.write(f"{arg_index},{task_name},{best_eval}\n")
 
     import os
-    os.makedirs(f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SHELL_{dataset}/", exist_ok=True)
-    torch.save(best_state_dict, f"/lab/tmpig8d/u/yuecheng/yuecheng_weight/SHELL_{dataset}/{model_type}_{task_name}.pth")
+    os.makedirs(f"{weight_path}/", exist_ok=True)
+    torch.save(best_state_dict, f"{weight_path}/{model_type}_{task_name}.pth")
 # #####################################################################################
 #             from thop import profile
 #             import timm

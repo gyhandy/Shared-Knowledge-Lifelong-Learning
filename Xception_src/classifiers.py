@@ -98,8 +98,8 @@ class Xception_TB(nn.Module):
         self.num_class = num_class
         import timm
         model = timm.create_model('xception',pretrained=True)
-        # for param in model.parameters():
-        #     param.require_grad = False
+        for param in model.parameters():
+            param.require_grad = False
 
         self.base = nn.Sequential( *(list(add_Convbias(model).children())[:-1]) )
         self.feat_size = 2048
@@ -137,8 +137,8 @@ class Resnet_TB(nn.Module):
         super(Resnet_TB,self).__init__()
         self.num_class = num_class
         model = models.resnet18(pretrained=True)
-        # for param in model.parameters():
-        #     param.require_grad = False
+        for param in model.parameters():
+            param.require_grad = False
 
         self.base = nn.Sequential( *(list(add_Convbias(model).children())[:-1]) )
         self.feat_size = 512
