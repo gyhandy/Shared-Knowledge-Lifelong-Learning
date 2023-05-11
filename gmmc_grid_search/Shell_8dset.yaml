@@ -1,0 +1,49 @@
+dset_name: 8dset
+dataroot: /lab/tmpig20c/u/arios/8dset/
+experiment_path: ../Experiments/dset8/shell_sequence/
+test_num: 1
+device: 0
+
+# dset_name: atari
+# dataroot: /lab/tmpig8d/u/andy_data/1000_samples_per_game/
+# experiment_path: ../Experiments/atari/shell_sequence/
+# test_split_percent: 0.3
+# subset_per_class: None # number of samples per class
+# test_num: 2 # To run without test mode, put -1
+# device: 0
+
+## Sampling configs
+sample_classes: False
+class_sample_num: 10
+sample_dset_method: '' ## Possible choices: ['','random','random_by_class']
+random_sample_num: 100
+save_sampled: ""
+
+# TODO maybe put the parameters in separate configs
+task_mapper_params:
+  task_mapper_type: gmm
+  n_cluster_min: 2
+  n_cluster_max: 2
+  covariance_type: 'diag' # full or diag
+
+
+# -------------------------------------------
+# -------------- general configs ------------
+# -------------------------------------------
+
+seed: 10
+batchsize_process: 128 #to get features to fit but not train backbone
+
+num_threads: 1
+num_workers: 1
+
+# ----- feature extraction
+fc_sizes: ''
+net_type: resnet18_contrastive
+# feat_layer_output: base.8
+feat_layer_output: act4
+feat_layer_factors: -1
+use_image_as_input: False
+
+
+dir_results: ../Results/
