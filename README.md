@@ -22,3 +22,5 @@ python initial_training.py
 cd gmmc_grid_search
 python gmmc_xception.py
 ```
+
+just move gmmc_grid_search/gmmc_xception.py to main.py
