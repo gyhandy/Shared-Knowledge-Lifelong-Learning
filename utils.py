@@ -1,17 +1,74 @@
+import torch
+import torch.nn.functional as F
+
+from datetime import datetime
+
 import yaml
 import os
 import numpy as np
-import re
-from torch.utils.data import Dataset
 import random
-import PIL
-import torch
 import shutil
-from datetime import datetime
 import json
-from torch.nn import Linear, CrossEntropyLoss, Softmax
-from argparse import Namespace
+from torch.nn import Softmax
 
+# following is the helper function for BB
+def log(log_path, filename, message, model_type, write_time=False):
+    import os
+    os.makedirs(log_path, exist_ok=True)
+    with open(log_path+filename+f"_{model_type}.txt", "a") as f:
+        if write_time:
+            f.write(str(datetime.now()))
+            f.write("\n")
+        f.write(str(message))
+        f.write("\n")
+
+def train(train_loader, model, optimizer, device=torch.device("cuda:0")):
+    model.eval() # backbone shouldn't learn new mean and variance since they are all fixed
+    correct = 0
+    total = 0
+    for batch_idx, batch in enumerate(train_loader):
+        im, target = batch
+        total+= im.shape[0]
+        im, target = im.to(device), target.to(device)
+        optimizer.zero_grad()
+        
+        output = model(im)
+        
+        pred = output.data.max(1, keepdim=True)[1]
+        correct += pred.eq(target.data.view_as(pred)).cpu().sum()
+        ce_loss = F.cross_entropy(output, target)
+        loss = ce_loss 
+        loss.backward()
+        optimizer.step()
+
+    return correct/total, loss
+
+def eval(model, val_loaders, device=torch.device("cuda:0")):
+    model.eval()
+    correct = 0
+    total = 0
+    class_correct = 0
+
+    class_correct = 0
+    for batch_idx, batch in enumerate(val_loaders):
+        im, target = batch
+        im, target = im.to(device), target.to(device)
+        output = model(im)
+        pred = output.data.max(1, keepdim=True)[1]
+        class_correct += pred.eq(target.data.view_as(pred)).cpu().sum()
+    return class_correct/len(val_loaders.dataset)
+
+def add_parameters(params, model, layer_type):
+    for name, layer in model.named_children():
+        if isinstance(layer, layer_type):
+            params += list(layer.parameters())
+        params = add_parameters(params, layer, layer_type)
+    return params
+
+
+
+
+# following is the helper function for gmmc
 def read_file(filename):
     container = []
     with open(filename, "r") as f:
@@ -19,16 +76,6 @@ def read_file(filename):
             data = line.strip().split()
             container.append((data[0],int(data[1])))
     return container
-
-def log(filename, message, write_time=False):
-    if not os.path.exists("/lab/tmpig8d/u/yuecheng/yuecheng_log/SKILL_gmmc/"):
-        os.mkdir("/lab/tmpig8d/u/yuecheng/yuecheng_log/SKILL_gmmc/")
-    with open("/lab/tmpig8d/u/yuecheng/yuecheng_log/SKILL_gmmc/"+filename+".txt", "a") as f:
-        if write_time:
-            f.write(str(datetime.now()))
-            f.write("\n")
-        f.write(str(message))
-        f.write("\n")
 
 def setup(args):
     makedirectory(args['dir_results'])
@@ -65,29 +112,22 @@ def seed_torch(seed=0):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-
 def makedirectory(dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
-
 
 def divide_integer_K(N,K, shuff=True):
     '''Divide an integer into equal parts exactly'''
     array=np.zeros(K,)
     for i in range(K):
         array[i] = int(N / K)    # integer division
-
     # divide up the remainder
     for i in range(N%K):
         array[i] += 1
-        
     array = array.astype(int)
-
     if shuff:
         np.random.shuffle(array)
-        
     return array
-
 
 def get_args_from_yaml(args, params_parser):
     with open(args['config_file']) as fid:

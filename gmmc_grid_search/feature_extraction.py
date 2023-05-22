@@ -85,10 +85,6 @@ def extract_features(taskID, feature_extractor, data_loader,
     return features_dict, target_labels, target_coarse_labels
 
 
-
-
-
-
 class NetworkLatents():
     def __init__(self, model: nn.Module, layer_names, pool_factors=None):
         self.layer_names = layer_names
