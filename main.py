@@ -17,8 +17,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--result', type=str, default='./result/')
     parser.add_argument('--weight', type=str, default='./weight/')
-    parser.add_argument('--data', type=str, default='./data/')
-    parser.add_argument('--method', type=str, default="Linear_SKILL", help="Linear_SKILL for linear feature dataset with \
+    parser.add_argument('--data', type=str, default="/lab/tmpig15b/u/")
+    parser.add_argument('--method', type=str, default="BB_SKILL", help="Linear_SKILL for linear feature dataset with \
                         fc layer. BB_SKILL for imagedataset with BB implementation. If you want to test the fc performance with a \
                         image folder, simply type Linear")
     parser.add_argument('--task_mapper', type=str, default="GMMC")
@@ -35,16 +35,16 @@ if __name__ == "__main__":
         os.mkdir(args.prediction)
     # You may want to use your own code for dataset, here we provide datasets we presented in the paper
     ##############################################################################################################
-    # if args.method == "Linear_SKILL":
-    #     train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="features")
-    # else:
-    #     train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="original")
-    tr_1, te_1, trl_1, tel_1 = load_dataloader(0)
-    tr_2, te_2, trl_2, tel_2 = load_dataloader(1)
-    train_datasets = [tr_1, tr_2]
-    test_datasets = [te_1, te_2]
-    train_loaders = [trl_1, trl_2]
-    test_loaders = [tel_1, tel_2]
+    if args.method == "Linear_SKILL":
+        train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="features")
+    else:
+        train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="original")
+    # tr_1, te_1, trl_1, tel_1 = load_dataloader(0, input_type="original", root_path=args.data)
+    # tr_2, te_2, trl_2, tel_2 = load_dataloader(1, input_type="original", root_path=args.data)
+    # train_datasets = [tr_1, tr_2]
+    # test_datasets = [te_1, te_2]
+    # train_loaders = [trl_1, trl_2]
+    # test_loaders = [tel_1, tel_2]
     num_task = len(train_datasets)
     #############################################################################################################
     for i in range(num_task):
@@ -102,13 +102,13 @@ if __name__ == "__main__":
     # Now we can do GMMC, you can also replaced with a perfect task oracle
     if args.task_mapper == "GMMC":
 
-        # feature_train_datasets, feature_val_datasets, feature_train_loaders, feature_val_loaders = load_dataloader(-1, shuffle_test=False, input_type="features")
-        ftr_1, fte_1, ftrl_1, ftel_1 = load_dataloader(0, shuffle_test=False, input_type="features")
-        ftr_2, fte_2, ftrl_2, ftel_2 = load_dataloader(1, shuffle_test=False, input_type="features")
-        feature_train_datasets = [ftr_1, ftr_2]
-        feature_val_datasets = [fte_1, fte_2]
-        feature_train_loaders = [ftrl_1, ftrl_2]
-        feature_val_loaders = [ftel_1, ftel_2]
+        feature_train_datasets, feature_val_datasets, feature_train_loaders, feature_val_loaders = load_dataloader(-1, shuffle_test=False, input_type="features")
+        # ftr_1, fte_1, ftrl_1, ftel_1 = load_dataloader(0, shuffle_test=False, input_type="features")
+        # ftr_2, fte_2, ftrl_2, ftel_2 = load_dataloader(1, shuffle_test=False, input_type="features")
+        # feature_train_datasets = [ftr_1, ftr_2]
+        # feature_val_datasets = [fte_1, fte_2]
+        # feature_train_loaders = [ftrl_1, ftrl_2]
+        # feature_val_loaders = [ftel_1, ftel_2]
 
         total_classes = [train_dataset.num_classes for train_dataset in feature_train_datasets]
         class_list = [train_dataset.dataset_name for train_dataset in feature_train_datasets]
