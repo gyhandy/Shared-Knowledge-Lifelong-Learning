@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--task_mapper', type=str, default="GMMC")
     parser.add_argument('--n_c', type=int, default=25)
     parser.add_argument('--prediction', type=str, default='./prediction/')
+    parser.add_argument('--activation_size', type=int, default=2048)
     args = parser.parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
@@ -33,18 +34,12 @@ if __name__ == "__main__":
         os.mkdir(args.weight)
     if not os.path.exists(args.prediction):
         os.mkdir(args.prediction)
-    # You may want to use your own code for dataset, here we provide datasets we presented in the paper
+    # @TODO You may want to use your own code for dataset, here we provide datasets we presented in the paper
     ##############################################################################################################
     if args.method == "Linear_SKILL":
         train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="features")
     else:
         train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="original")
-    # tr_1, te_1, trl_1, tel_1 = load_dataloader(0, input_type="original", root_path=args.data)
-    # tr_2, te_2, trl_2, tel_2 = load_dataloader(1, input_type="original", root_path=args.data)
-    # train_datasets = [tr_1, tr_2]
-    # test_datasets = [te_1, te_2]
-    # train_loaders = [trl_1, trl_2]
-    # test_loaders = [tel_1, tel_2]
     num_task = len(train_datasets)
     #############################################################################################################
     for i in range(num_task):
@@ -53,16 +48,16 @@ if __name__ == "__main__":
         train_loader = train_loaders[i]
         test_loader = test_loaders[i]
 
-        task_name = train_dataset.dataset_name # name for your ith dataset, you can set it with your own method
-        train_num_class = train_dataset.num_classes # number of classes of your ith dataset, you can set it with your own method
+        task_name = train_dataset.dataset_name # @TODO name for your ith dataset, you can set it with your own method
+        train_num_class = train_dataset.num_classes # @TODO number of classes of your ith dataset, you can set it with your own method
 
         if args.method == "Linear":
             model = timm.create_model('xception',pretrained=True)
             for param in model.parameters():
                 param.requires_grad = False
-            model.fc = torch.nn.Linear(in_features=2048, out_features=train_num_class, bias=True)
+            model.fc = torch.nn.Linear(in_features=args.activation_size, out_features=train_num_class, bias=True)
         elif args.method == "Linear_SKILL":
-            model = torch.nn.Linear(in_features=2048, out_features=train_num_class, bias=True)
+            model = torch.nn.Linear(in_features=args.activation_size, out_features=train_num_class, bias=True)
         elif args.method == "BB_SKILL":
             model = Xception_TB(train_num_class)
 
@@ -102,20 +97,15 @@ if __name__ == "__main__":
     # Now we can do GMMC, you can also replaced with a perfect task oracle
     if args.task_mapper == "GMMC":
 
+        # @TODO you need to create a feature dataset which is the activation from your backbone network
         feature_train_datasets, feature_val_datasets, feature_train_loaders, feature_val_loaders = load_dataloader(-1, shuffle_test=False, input_type="features")
-        # ftr_1, fte_1, ftrl_1, ftel_1 = load_dataloader(0, shuffle_test=False, input_type="features")
-        # ftr_2, fte_2, ftrl_2, ftel_2 = load_dataloader(1, shuffle_test=False, input_type="features")
-        # feature_train_datasets = [ftr_1, ftr_2]
-        # feature_val_datasets = [fte_1, fte_2]
-        # feature_train_loaders = [ftrl_1, ftrl_2]
-        # feature_val_loaders = [ftel_1, ftel_2]
 
         total_classes = [train_dataset.num_classes for train_dataset in feature_train_datasets]
         class_list = [train_dataset.dataset_name for train_dataset in feature_train_datasets]
 
         for i in range(len(class_list)):
             if args.method == "Linear_SKILL":
-                fc = torch.nn.Linear(in_features=2048, out_features=total_classes[i], bias=True)
+                fc = torch.nn.Linear(in_features=args.activation_size, out_features=total_classes[i], bias=True)
                 state_dict = torch.load(os.path.join(args.weight, f"{args.method}_{class_list[i]}.pth"), map_location=device)
                 with torch.no_grad():
                     fc.weight.copy_(state_dict['weight'])
