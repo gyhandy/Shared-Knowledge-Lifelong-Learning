@@ -17,7 +17,7 @@ def log(log_path, filename, message, model_type, write_time=False):
     os.makedirs(log_path, exist_ok=True)
     with open(log_path+filename+f"_{model_type}.txt", "a") as f:
         if write_time:
-            f.write(str(datetime.datetime.now()))
+            f.write(str(datetime.now()))
             f.write("\n")
         f.write(str(message))
         f.write("\n")

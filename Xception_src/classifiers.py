@@ -10,7 +10,7 @@ import sys
 import torchvision
 from torchvision import datasets, models, transforms
 
-from Conv_BP_layer_prototype import *
+from Xception_src.Conv_BP_layer_prototype import *
 
 class Xception_Baseline_multiple_task(nn.Module):
     def __init__(self,num_classes, num_tasks):

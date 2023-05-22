@@ -2,7 +2,7 @@ import numpy as np
 from argparse import Namespace
 import sys
 
-import TaskMappers.gmmc as gmmc
+import gmmc_grid_search.TaskMappers.gmmc as gmmc
 sys.path.append("../")
 from utils import log
 
