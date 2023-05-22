@@ -96,7 +96,6 @@ if __name__ == "__main__":
 
     # Now we can do GMMC, you can also replaced with a perfect task oracle
     if args.task_mapper == "GMMC":
-
         # @TODO you need to create a feature dataset which is the activation from your backbone network
         feature_train_datasets, feature_val_datasets, feature_train_loaders, feature_val_loaders = load_dataloader(-1, shuffle_test=False, input_type="features")
 
@@ -180,3 +179,5 @@ if __name__ == "__main__":
             write_result(os.path.join(args.result, f"gmmc_{args.n_c}.csv"), final_acc)
             if t == num_task-1:
                 log(args.result, "final", f"final acc is {np.average(final_acc)}", args.task_mapper, write_time=True)
+    elif args.task_mapper == "MAHA":
+        print("not implemented yet")
