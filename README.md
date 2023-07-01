@@ -1,6 +1,13 @@
 # Shared-Knowledge-Lifelong-Learning
 [TMLR] Lightweight Learner for Shared Knowledge Lifelong Learning
 
+# download file
+
+```
+wget https://ilab.usc.edu/andy/skill-dataset/skill/SKILL-Dataset-backend.zip
+unzip SKILL-Dataset-backend.zip
+```
+
 ## General directory structure
 
 - `dataset/` contains code for declare `train_datasets`, `val_datasets`, `train_loaders`, and `val_loaders` for the DCT dataset, each is a list of 107 datasets contains in the DCT. You can also define your own `train_datasets`, `val_datasets`, `train_loaders`, and `val_loaders` for your own datasets. Place to change is commented in the main code
