@@ -1,11 +1,18 @@
 # Shared-Knowledge-Lifelong-Learning
 [TMLR] Lightweight Learner for Shared Knowledge Lifelong Learning
 
-# download file
+# download file(single file)
 
 ```
 wget https://ilab.usc.edu/andy/skill-dataset/skill/SKILL-Dataset-backend.zip
 unzip SKILL-Dataset-backend.zip
+```
+
+```
+wget https://ilab.usc.edu/andy/skill-dataset/seperate-v/skill-dataset.z01
+wget https://ilab.usc.edu/andy/skill-dataset/seperate-v/skill-dataset.z02
+wget https://ilab.usc.edu/andy/skill-dataset/seperate-v/skill-dataset.zip
+unzip skill-dataset.zip
 ```
 
 ## General directory structure
