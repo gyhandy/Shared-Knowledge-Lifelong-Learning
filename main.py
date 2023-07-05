@@ -10,6 +10,7 @@ from Xception_src.classifiers import *
 from Xception_src.Conv_BP_layer_prototype import *
 from dataset.dataloader_reader import load_dataloader
 import gmmc_grid_search.TaskMappers.proto_mapper as pmap
+from maha_src.mahalanobis import * 
 from utils import *
 
 
@@ -23,6 +24,7 @@ if __name__ == "__main__":
                         image folder, simply type Linear")
     parser.add_argument('--task_mapper', type=str, default="GMMC")
     parser.add_argument('--n_c', type=int, default=25)
+    parser.add_argument('--mag', type=int, default=5)
     parser.add_argument('--prediction', type=str, default='./prediction/')
     parser.add_argument('--activation_size', type=int, default=2048)
     args = parser.parse_args()
@@ -179,5 +181,59 @@ if __name__ == "__main__":
             write_result(os.path.join(args.result, f"gmmc_{args.n_c}.csv"), final_acc)
             if t == num_task-1:
                 log(args.result, "final", f"final acc is {np.average(final_acc)}", args.task_mapper, write_time=True)
+
+
     elif args.task_mapper == "MAHA":
-        print("not implemented yet")
+
+        # @TODO you need to create a feature dataset which is the activation from your backbone network
+        feature_train_datasets, feature_val_datasets, feature_train_loaders, feature_val_loaders = load_dataloader(-1, shuffle_test=False, input_type="features")
+
+        total_classes = [train_dataset.num_classes for train_dataset in feature_train_datasets]
+        class_list = [train_dataset.dataset_name for train_dataset in feature_train_datasets]
+
+        for i in range(len(class_list)):
+            if args.method == "Linear_SKILL":
+                fc = torch.nn.Linear(in_features=args.activation_size, out_features=total_classes[i], bias=True)
+                state_dict = torch.load(os.path.join(args.weight, f"{args.method}_{class_list[i]}.pth"), map_location=device)
+                with torch.no_grad():
+                    fc.weight.copy_(state_dict['weight'])
+                    fc.bias.copy_(state_dict["bias"])
+                fc.to(device)
+                fc.eval()
+
+                inference_result = inference(fc, feature_val_loaders[i])
+                torch.save(inference_result, os.path.join(args.prediction, f"{args.method}_{class_list[i]}.pth"))
+
+            elif args.method == "BB_SKILL":
+                BB_model = Xception_TB(total_classes[i])
+                original_state_dict = BB_model.state_dict()
+
+                state_dict = torch.load(os.path.join(args.weight, f"{args.method}_{class_list[i]}.pth"), map_location=device)
+                for param in original_state_dict:
+                    if param[-6:] == "1.bias" or param == "fc.weight" or param == "fc.bias":
+                        original_state_dict[param] = state_dict[param]
+                BB_model.load_state_dict(state_dict)
+                BB_model.to(device)
+                BB_model.eval()
+
+                BB_result = inference(BB_model, test_loaders[i])
+                torch.save(BB_result, os.path.join(args.prediction, f"{args.method}_{class_list[i]}.pth"))
+
+        prediction_results =[]
+        for i in range(len(class_list)):
+            prediction_result = torch.load(os.path.join(args.prediction, f"{args.method}_{class_list[i]}.pth"))
+            prediction_results.append(prediction_result)
+
+        def write_result(filename, result):
+            with open(filename, "a") as f:
+                f.write(str(result)[1:-1])
+                f.write("\n")
+
+        final_accs = [[] for _ in range(num_task)]
+        for t in range(num_task):
+            precision, sample_class_mean, num_classes = compute_mabalanobis_stats(feature_train_datasets[:t+1], args.mag, device)
+            final_acc = run_mahalanobis(feature_val_datasets, precision, sample_class_mean, prediction_results, device)
+            final_accs[t] = final_acc
+            write_result(os.path.join(args.result, f"maha_{args.mag}.csv"), final_acc)
+            if t == num_task-1:
+                log(args.result, "final", f"final acc is {np.average(final_acc)}", args.task_mapper, write_time=True)
