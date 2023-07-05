@@ -72,10 +72,10 @@ unzip skill-dataset.zip
 
 - To run a BB network with GMMC
 ```
-python main.py
+python main.py --data <Folder where you unzip>
 ```
 
 - To run a Linear Classifier with GMMC
 ```
-python main.py --method Linear_SKILL
+python main.py --method Linear_SKILL --data <Folder where you unzip>
 ```
