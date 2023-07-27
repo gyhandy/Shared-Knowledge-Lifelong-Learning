@@ -103,10 +103,24 @@ unzip skill-dataset.zip
 ```
 python main.py --data <Folder where you unzip>
 ```
+The result can be found in Table 1. Row 2
 
 - To run a Linear Classifier with GMMC
 ```
 python main.py --method Linear_SKILL --data <Folder where you unzip>
 ```
+The result can be found in Table 1. Row 1
+
+- To run a BB network with Mahalanobis
+```
+python main.py --data <Folder where you unzip> --task_mapper MAHA
+```
+The result can be found in Table 1. Row 4
+
+- To run a Linear Classifier with Mahalanobis
+```
+python main.py --method Linear_SKILL --data <Folder where you unzip> --task_mapper MAHA
+```
+The result can be found in Table 1. Row 3
 
 The code will learn 102 small and separte heads(either a linear head or a linear head with a task bias) for each tasks respectively in order. This step can be parallized on multiple GPUS with one task per GPU. The heads will be saved in the weight folder. After that, the code will learn a task mapper(Either using GMMC or Mahalanobis) to distinguish image task-wisely. Then, all images will be evaluated in the same time without a task label.
