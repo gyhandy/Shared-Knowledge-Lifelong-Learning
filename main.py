@@ -39,9 +39,9 @@ if __name__ == "__main__":
     # @TODO You may want to use your own code for dataset, here we provide datasets we presented in the paper
     ##############################################################################################################
     if args.method == "Linear_SKILL":
-        train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="features")
+        train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="features", root_path=args.data)
     else:
-        train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="original")
+        train_datasets, test_datasets, train_loaders, test_loaders = load_dataloader(-1, input_type="original", root_path=args.data)
     num_task = len(train_datasets)
     #############################################################################################################
     for i in range(num_task):
