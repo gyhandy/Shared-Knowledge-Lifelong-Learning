@@ -1,6 +1,6 @@
 # Shared-Knowledge-Lifelong-Learning
 [TMLR] Lightweight Learner for Shared Knowledge Lifelong Learning
-### [Project Page](http://ilab.usc.edu/andy/skill) | [SKILL-102 dataset](http://ilab.usc.edu/andy/skill102) | [Video(pending)](https://youtu.be/hmOtuNC1ANU?si=-x3cIYksbkumfWa9) | [Paper](https://openreview.net/pdf?id=Jjl2c8kWUc) | [Huggingface](https://huggingface.co/datasets/Harry-Li-27/SKILL)
+### [Project Page](http://ilab.usc.edu/andy/skill) | [SKILL-102 dataset](http://ilab.usc.edu/andy/skill102) | [Video](https://youtu.be/hmOtuNC1ANU?si=-x3cIYksbkumfWa9) | [Paper](https://openreview.net/pdf?id=Jjl2c8kWUc) | [Huggingface](https://huggingface.co/datasets/Harry-Li-27/SKILL)
 
 > **Lightweight Learner for Shared Knowledge Lifelong Learning** <br>
 > Yunhao Ge, Yuecheng Li, Di Wu, Ao Xu, Adam M. Jones, Amanda Sofie Rios, Iordanis Fostiropoulos, shixian wen, Po-Hsuan Huang, Zachary William Murdock, Gozde Sahin, Shuo Ni, Kiran Lekkala, Sumedh Anand Sontakke, Laurent Itti <br>
