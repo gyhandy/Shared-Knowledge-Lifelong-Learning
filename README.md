@@ -53,12 +53,6 @@ git clone https://github.com/gyhandy/Shared-Knowledge-Lifelong-Learning.git
 
 ### Download file
 
-#### Single file downloading option (~1.6T)
-```
-wget http://ilab.usc.edu/andy/skill-dataset/skill/SKILL-Dataset-backend.zip
-unzip SKILL-Dataset-backend.zip
-```
-
 #### Multiple files downloading option(~600G per file)
 ```
 wget http://ilab.usc.edu/andy/skill-dataset/separate-v/skill-dataset.z01
